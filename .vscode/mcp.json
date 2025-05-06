@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "upbit-candles-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["src/upbit_candles_mcp/server.py"]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+[project]
+name = "upbit-candles-mcp"
+version = "0.1.0"
+description = "MCP server for fetching daily candles from Upbit API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+ "fastmcp>=2.2.8",
+ "mcp>=1.7.1",
+ "python-dotenv>=1.1.0",
+ "requests>=2.32.3",
+]
+[[project.authors]]
+name = "gyuha"
+email = "nicegyuha@gmail.com"
+
+[build-system]
+requires = [ "hatchling",]
+build-backend = "hatchling.build"
+
+[project.scripts]
+upbit-candles-mcp = "upbit_candles_mcp:main"
