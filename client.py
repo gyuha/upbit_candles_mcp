@@ -7,7 +7,7 @@ to fetch cryptocurrency price data from Upbit.
 
 import asyncio
 import os
-import json
+import re
 
 from fastmcp import Client
 
@@ -25,15 +25,20 @@ async def main():
         # 사용 가능한 마켓 목록 확인
         print("\n사용 가능한 마켓 목록을 가져오는 중...")
         markets_response = await client.read_resource("upbit://markets")
-        
-        # In MCP, resource content is automatically serialized to JSON
-        markets = []
-        for item in markets_response:
-            # Convert each item to a string
-            markets.append(str(item))
-            
+
+        # Extract market symbols from the response
+        markets_raw = str(markets_response)
+        # Use regex to extract the market codes
+        markets_match = re.search(r"\[(.*?)\]", markets_raw)
+        if markets_match:
+            markets_str = markets_match.group(1)
+            # Split by commas and clean up the strings
+            markets = [m.strip(" \"'\\n") for m in markets_str.split(",")]
+        else:
+            markets = []
+
         print(f"사용 가능한 마켓: {len(markets)}개")
-        
+
         # Display example markets
         if markets:
             print(f"예시: {', '.join(markets[:5])}...\n")
@@ -50,11 +55,12 @@ async def main():
         )
 
         print("\n일봉 데이터 결과:")
-        # In MCP, tool results are returned as objects with different attributes
-        if hasattr(result, 'text'):
-            print(result.text)
-        else:
-            print(str(result))
+        # Parse and print the tool response
+        result_str = str(result)
+        # Clean up the response by removing annotations and formatting
+        result_text = re.sub(r", annotations=None\)\]", "", result_str)
+        result_text = result_text.replace("\\n", "\n")
+        print(result_text)
 
         # 가격 변동 분석
         print(f"\n{market} 가격 변동 분석 중...")
@@ -63,10 +69,12 @@ async def main():
         )
 
         print("\n가격 변동 분석 결과:")
-        if hasattr(price_analysis, 'text'):
-            print(price_analysis.text)
-        else:
-            print(str(price_analysis))
+        # Parse and print the price analysis response
+        analysis_str = str(price_analysis)
+        # Clean up the response
+        analysis_text = re.sub(r", annotations=None\)\]", "", analysis_str)
+        analysis_text = analysis_text.replace("\\n", "\n")
+        print(analysis_text)
 
 
 if __name__ == "__main__":
